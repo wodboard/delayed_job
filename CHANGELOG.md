@@ -1,3 +1,8 @@
+4.1.8 - In Progress
+=================
+* Allow Rails 6.0
+* Update failed message to be more clear
+
 4.1.7 - 2019-06-20
 =================
 * Fix loading Delayed::PerformableMailer when ActionMailer isn't loaded yet
