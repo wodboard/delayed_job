@@ -1,3 +1,8 @@
+4.1.6 - In Progress
+=================
+* Allow Rails 6.0
+* Update failed message to be more clear
+
 4.1.5 - 2018-04-13
 =================
 * Allow Rails 5.2
