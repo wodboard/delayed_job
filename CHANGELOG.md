@@ -1,3 +1,8 @@
+4.1.7 - In Progress
+=================
+* Allow Rails 6.0
+* Update failed message to be more clear
+
 4.1.6 - 2019-06-19
 =================
 * Properly initialize ActionMailer outside railties (#1077)
