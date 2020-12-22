@@ -49,15 +49,11 @@ module Delayed
     end
 
     # rubocop:disable MethodMissing
-    if RUBY_VERSION >= '3.0'
-      def method_missing(...)
-        object.send(...)
-      end
-    else
-      def method_missing(symbol, *args)
-        object.send(symbol, *args)
-      end
-    end
+    definition = RUBY_VERSION >= '3.0' ? '...' : '*args, &block'
+    method_def <<
+      "def method_missing(#{definition})" <<
+      "  object.send(#{definition})" <<
+      "end"
     # rubocop:enable MethodMissing
 
     def respond_to?(symbol, include_private = false)
