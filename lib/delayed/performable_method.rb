@@ -22,8 +22,26 @@ module Delayed
       end
     end
 
-    def perform
-      object.send(method_name, *args) if object
+    if RUBY_VERSION >= '3.0'
+      def perform
+        if args_is_a_hash?
+          object.send(method_name, **args.first)
+        else
+          object.send(method_name, *args)
+        end if object
+      rescue => e
+        p e.message
+        p args
+        raise e
+      end
+
+      def args_is_a_hash?
+        args.size == 1 && args.first.is_a?(Hash)
+      end
+    else
+      def perform
+        object.send(method_name, *args) if object
+      end
     end
 
     def method(sym)
@@ -31,8 +49,14 @@ module Delayed
     end
 
     # rubocop:disable MethodMissing
-    def method_missing(symbol, *args)
-      object.send(symbol, *args)
+    if RUBY_VERSION >= '3.0'
+      def method_missing(symbol, ...)
+        object.send(symbol, ...)
+      end
+    else
+      def method_missing(symbol, *args)
+        object.send(symbol, *args)
+      end
     end
     # rubocop:enable MethodMissing
 
