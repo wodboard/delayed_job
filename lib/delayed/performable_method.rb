@@ -49,11 +49,15 @@ module Delayed
     end
 
     # rubocop:disable MethodMissing
+    method_def = []
+    location = caller_locations(1, 1).first
+    file, line = location.path, location.lineno
     definition = RUBY_VERSION >= '3.0' ? '...' : '*args, &block'
     method_def <<
       "def method_missing(#{definition})" <<
       "  object.send(#{definition})" <<
       "end"
+    module_eval(method_def.join(";"), file, line)
     # rubocop:enable MethodMissing
 
     def respond_to?(symbol, include_private = false)
