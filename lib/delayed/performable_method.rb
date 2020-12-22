@@ -29,10 +29,10 @@ module Delayed
         else
           object.send(method_name, *args)
         end if object
-      rescue => e
-        p e.message
-        p args
-        raise e
+#      rescue => e
+#        p e.message
+#        p args
+#        raise e
       end
 
       def args_is_a_hash?
