@@ -50,8 +50,8 @@ module Delayed
 
     # rubocop:disable MethodMissing
     if RUBY_VERSION >= '3.0'
-      def method_missing(symbol, ...)
-        object.send(symbol, ...)
+      def method_missing(...)
+        object.send(...)
       end
     else
       def method_missing(symbol, *args)
