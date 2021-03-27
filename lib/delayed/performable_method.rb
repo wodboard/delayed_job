@@ -22,6 +22,10 @@ module Delayed
       end
     end
 
+    # required to support named parameters in RUBY 3.0
+    # Otherwise the following error is thrown
+    # ArgumentError:
+    #   wrong number of arguments (given 1, expected 0; required keywords:
     if RUBY_VERSION >= '3.0'
       def perform
         if args_is_a_hash?
