@@ -1,5 +1,5 @@
 require 'helper'
-require 'action_controller/metal/strong_parameters' if ActionPack::VERSION::MAJOR >= 4
+require 'action_controller/metal/strong_parameters' if ActionPack::VERSION::MAJOR >= 5
 
 describe Delayed::PerformableMethod do
   describe 'perform' do
@@ -45,7 +45,7 @@ describe Delayed::PerformableMethod do
     end
   end
 
-  if ActionPack::VERSION::MAJOR >= 4
+  if ActionPack::VERSION::MAJOR >= 5
     describe 'perform with params object' do
       before do
         @params = ActionController::Parameters.new(:person => {
