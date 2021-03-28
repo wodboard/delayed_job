@@ -1,5 +1,5 @@
 require 'helper'
-require 'action_controller/metal/strong_parameters'
+require 'action_controller/metal/strong_parameters' if ActionPack.version.to_s >= '4.0'
 
 describe Delayed::PerformableMethod do
   describe 'perform' do
@@ -45,47 +45,49 @@ describe Delayed::PerformableMethod do
     end
   end
 
-  describe 'perform with params object' do
-    before do
-      @params = ActionController::Parameters.new(:person => {
-                                                   :name => 'Francesco',
-                                                   :age => 22,
-                                                   :role => 'admin'
-                                                 })
+  if ActionPack.version.to_s >= '4.0'
+    describe 'perform with params object' do
+      before do
+        @params = ActionController::Parameters.new(:person => {
+                                                     :name => 'Francesco',
+                                                     :age => 22,
+                                                     :role => 'admin'
+                                                   })
 
-      @method = Delayed::PerformableMethod.new('foo', :count, [@params])
-    end
-
-    it 'calls the method on the object' do
-      expect(@method.object).to receive(:count).with(@params)
-      @method.perform
-    end
-  end
-
-  describe 'perform with sample object and params object' do
-    before do
-      @params = ActionController::Parameters.new(:person => {
-                                                   :name => 'Francesco',
-                                                   :age => 22,
-                                                   :role => 'admin'
-                                                 })
-
-      klass = Class.new do
-        def test_method(_o1, _o2)
-          true
-        end
+        @method = Delayed::PerformableMethod.new('foo', :count, [@params])
       end
 
-      @method = Delayed::PerformableMethod.new(klass.new, :test_method, ['o', @params])
+      it 'calls the method on the object' do
+        expect(@method.object).to receive(:count).with(@params)
+        @method.perform
+      end
     end
 
-    it 'calls the method on the object' do
-      expect(@method.object).to receive(:test_method).with('o', @params)
-      @method.perform
-    end
+    describe 'perform with sample object and params object' do
+      before do
+        @params = ActionController::Parameters.new(:person => {
+                                                     :name => 'Francesco',
+                                                     :age => 22,
+                                                     :role => 'admin'
+                                                   })
 
-    it 'calls the method on the object (real)' do
-      expect(@method.perform).to be true
+        klass = Class.new do
+          def test_method(_o1, _o2)
+            true
+          end
+        end
+
+        @method = Delayed::PerformableMethod.new(klass.new, :test_method, ['o', @params])
+      end
+
+      it 'calls the method on the object' do
+        expect(@method.object).to receive(:test_method).with('o', @params)
+        @method.perform
+      end
+
+      it 'calls the method on the object (real)' do
+        expect(@method.perform).to be true
+      end
     end
   end
 
