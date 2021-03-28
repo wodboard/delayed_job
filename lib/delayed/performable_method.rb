@@ -28,15 +28,13 @@ module Delayed
     #   wrong number of arguments (given 1, expected 0; required keywords:
     if RUBY_VERSION >= '3.0'
       def perform
+        return unless object
+
         if args_is_a_hash?
           object.send(method_name, **args.first)
         else
           object.send(method_name, *args)
-        end if object
-#      rescue => e
-#        p e.message
-#        p args
-#        raise e
+        end
       end
 
       def args_is_a_hash?
@@ -51,17 +49,16 @@ module Delayed
     def method(sym)
       object.method(sym)
     end
-
-    # rubocop:disable MethodMissing
     method_def = []
     location = caller_locations(1, 1).first
-    file, line = location.path, location.lineno
+    file = location.path
+    line = location.lineno
     definition = RUBY_VERSION >= '3.0' ? '...' : '*args, &block'
     method_def <<
-      "def method_missing(#{definition})" <<
-      "  object.send(#{definition})" <<
-      "end"
-    module_eval(method_def.join(";"), file, line)
+      "def method_missing(#{definition})" \
+      "  object.send(#{definition})" \
+      'end'
+    module_eval(method_def.join(';'), file, line)
     # rubocop:enable MethodMissing
 
     def respond_to?(symbol, include_private = false)
