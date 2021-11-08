@@ -34,6 +34,17 @@ describe Delayed::PerformableMethod do
     end
   end
 
+  describe 'perform with hash object and kwargs' do
+    before do
+      @method = Delayed::PerformableMethod.new('foo', :count, [{:o => true}], :o2 => false)
+    end
+
+    it 'calls the method on the object' do
+      expect(@method.object).to receive(:count).with({:o => true}, :o2 => false)
+      @method.perform
+    end
+  end
+
   describe 'perform with many hash objects' do
     before do
       @method = Delayed::PerformableMethod.new('foo', :count, [{:o => true}, {:o2 => true}])
@@ -110,7 +121,7 @@ describe Delayed::PerformableMethod do
         end
       end
 
-      @method = Delayed::PerformableMethod.new(klass.new, :test_method, [{:name => 'name', :any => 'any'}])
+      @method = Delayed::PerformableMethod.new(klass.new, :test_method, [], :name => 'name', :any => 'any')
     end
 
     it 'calls the method on the object' do

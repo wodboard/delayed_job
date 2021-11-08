@@ -1,8 +1,8 @@
 module Delayed
   class PerformableMethod
-    attr_accessor :object, :method_name, :args
+    attr_accessor :object, :method_name, :args, :kwargs
 
-    def initialize(object, method_name, args)
+    def initialize(object, method_name, args, kwargs = {})
       raise NoMethodError, "undefined method `#{method_name}' for #{object.inspect}" unless object.respond_to?(method_name, true)
 
       if object.respond_to?(:persisted?) && !object.persisted?
@@ -11,6 +11,7 @@ module Delayed
 
       self.object       = object
       self.args         = args
+      self.kwargs       = kwargs
       self.method_name  = method_name.to_sym
     end
 
@@ -22,23 +23,21 @@ module Delayed
       end
     end
 
-    # required to support named parameters in RUBY 3.0
-    # Otherwise the following error is thrown
-    # ArgumentError:
-    #   wrong number of arguments (given 1, expected 0; required keywords:
+    def kwargs
+      # Default to a hash so that we can handle deserializing jobs that were
+      # created before kwargs was available.
+      @kwargs || {}
+    end
+
+    # In ruby 3 we need to explicitly separate regular args from the keyword-args.
     if RUBY_VERSION >= '3.0'
       def perform
         return unless object
-
-        if args_is_a_hash?
-          object.send(method_name, **args.first)
+        if kwargs.present?
+          object.send(method_name, *args, **kwargs)
         else
           object.send(method_name, *args)
         end
-      end
-
-      def args_is_a_hash?
-        args.size == 1 && args.first.is_a?(Hash)
       end
     else
       def perform
