@@ -32,16 +32,17 @@ module Delayed
     # In ruby 3 we need to explicitly separate regular args from the keyword-args.
     if RUBY_VERSION >= '3.0'
       def perform
+        object.send(method_name, *args, **kwargs) if object
+      end
+    else
+      # On ruby 2, rely on the implicit conversion from a hash to kwargs
+      def perform
         return unless object
         if kwargs.present?
-          object.send(method_name, *args, **kwargs)
+          object.send(method_name, *args, kwargs)
         else
           object.send(method_name, *args)
         end
-      end
-    else
-      def perform
-        object.send(method_name, *args) if object
       end
     end
 
@@ -52,7 +53,7 @@ module Delayed
     location = caller_locations(1, 1).first
     file = location.path
     line = location.lineno
-    definition = RUBY_VERSION >= '3.0' ? '...' : '*args, &block'
+    definition = RUBY_VERSION >= '2.7' ? '...' : '*args, &block'
     method_def <<
       "def method_missing(#{definition})" \
       "  object.send(#{definition})" \
