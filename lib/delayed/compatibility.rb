@@ -2,7 +2,15 @@ require 'active_support/version'
 
 module Delayed
   module Compatibility
-    if ActiveSupport::VERSION::MAJOR >= 4
+    if ActiveSupport::VERSION::MAJOR >= 7
+      def self.executable_prefix
+        'bin'
+      end
+
+      def self.proxy_object_class
+        BasicObject
+      end
+    elsif ActiveSupport::VERSION::MAJOR >= 4
       require 'active_support/proxy_object'
 
       def self.executable_prefix
