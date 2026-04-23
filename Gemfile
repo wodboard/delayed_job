@@ -1,6 +1,7 @@
 source 'https://rubygems.org'
 
 gem 'rake'
+gem "benchmark"
 
 platforms :ruby do
   # Rails 5.1 is the first to work with sqlite 1.4
